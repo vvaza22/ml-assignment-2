@@ -42,6 +42,58 @@
 
 # Training
 
+## Decision Tree
+
+**MLflow**-ზე ექსპერიმენტის სახელია `DecisionTree_Training`.
+
+**DecisionTree** მოდელზე მუშაობა თავიდან დავიწყე `RFE` და `CorrelationFilter`-ის დახმარებით. მიზნათ მქონდა დასახული, რომ შემედარებინა DecisionTree-ის პერფორმანსი ამ ორი preprocessing ნაბიჯით და მათ გარეშე. 
+
+**MLflow**-ზე პირველი სამი run: `DecisionTree_Cleaning`, `DecisionTree_FeatureEngineering`, `DecisionTree_FeatureSelection` დალოგილია partial pipeline-ები მოდელის გარეშე. notebook-ში წერია მთლიანი კოდი.
+
+იმისათვის, რომ ჩემი კოდი გამეტესტა და კოდში ბაგების გამო დიდი დრო არ დამეკარგა რეალურ მონაცემებზე გაწვრთნისას მთლიანი dataset-დან ავიღე პირველი 1000 ჩანაწერი და ამ ჩანაწერებზე გავტესტე უბრალოდ ჩემი კოდის სისწორე. შესაბამისად **MLflow**-ზე დალოგილია: `DecisionTree_Model_Test_1`-დან `DecisionTree_Model_Test_3`-ის ჩათვლით მოდელები, რომელთაც შედარებით მაღალი `auc` ქულა აქვთ, თუმცა საბოლოო მოდელის არჩევანში ისინი არ გამითვალისწინებია.
+
+ამ მიდგომის გზით ადრევე აღმოვაჩინე, რომ **Kaggle** Submission-ებისთვის ითხოვდა არა უბრალოდ *0/1* prediction-ს, არამედ ალბათობებს თითოეული ტრანზაქციისთვის. რადგან **MLflow**-ზე დალოგილი მოდელის წამოღებისას `.predict_proba()` მეთოდის გამოყენება შეუძლებელი იყო, დავწერე ჩემი საკუთარი wrapper-ი: `ProbabilityModel(mlflow.pyfunc.PythonModel)`, რომელიც მეთოდი `.predict()`-ის გამოძახებისას რეალურად დააბრუნებდა ალბათობებს და არა უკვე prediction-ს. **MLflow**-ზე დავლოგე ამ wrapper-ში ჩასმული მოდელის საცდელი ვერსიებიც `DecisionTree_Model_PyFunc_1` და `DecisionTree_Model_PyFunc_2`.
+
+
+#### DecisionTree_Prob_Model
+
+https://dagshub.com/vvaza22/ml-assignment-2.mlflow/#/experiments/0/runs/26e34af9277844d49e150a7dece44cb4
+
+მას შემდეგ რაც დავრწმუნდი, რომ ჩემი კოდი მუშაობდა გავუშვი training მთლიან მონაცემებზე `GridSearch`-ის დახმარებით შემდეგი პარამეტრებით:
+
+```
+param_grid = {
+    "feature_selector__n_features_to_select": [5, 10, 20],
+    "classifier__max_depth": [5, 10],
+}
+```
+
+იმისათვის, რომ დავრწმუნებულიყავი, რომ მიღებული test_score ახლოს იქნებოდა რეალურ test_score-თან ყველგან ვიყენებდი `KFold Cross Validation`-ს და თითოეული მოდელის კანდიდატისთვის ვუშვებდი `3` fold-ზე.
+
+`GridSearch`-მა **1:30 სთ** training-ის შემდეგ შეარჩია ქვემოთ მოცემული ჰიპერპარამეტრები:
+```
+classifier__max_depth: 10
+feature_selector__n_features_to_select: 20
+```
+
+დადო შემდეგი საბოლოო ქულები:
+```
+mean_test_score: 0.81
+mean_train_score: 0.82
+```
+
+ამ შედეგიდან გამომდინარე გამიჩნდა ეჭვი, რომ მოდელი იყო `underfitted` და არასაკმარისად კომპლექსური.
+
+
+## Random Forest
+
+## AdaBoost
+
+
+## GradientBoost
+
+
+## XGBoost
 
 
 # MLflow Tracking
