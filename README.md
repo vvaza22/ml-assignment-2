@@ -84,6 +84,84 @@ mean_train_score: 0.82
 
 ამ შედეგიდან გამომდინარე გამიჩნდა ეჭვი, რომ მოდელი იყო `underfitted` და არასაკმარისად კომპლექსური.
 
+#### DecisionTree_Overfit
+
+https://dagshub.com/vvaza22/ml-assignment-2.mlflow/#/experiments/0/runs/5689c6e2a491453bbe78d2163cf0b334
+
+აღმოჩნდა, რომ max_depth-ის გაზრდით მოდელი გახდა overfitted.
+
+```
+auc_test_score: 0.8208344133102746
+auc_train_score: 0.8633249269569131
+```
+
+ფაქტობრივად დაიწყო train set-ში მონაცემების დაზეპირება მოდელმა, რამაც გამოიწვია მისი ვარიაციის გაზრდა test set-ზე.
+
+
+#### DecisionTree_Prob_NoPreprocessing
+https://dagshub.com/vvaza22/ml-assignment-2.mlflow/#/experiments/0/runs/31e2ed91958f4dfe915af000d03a93b9
+
+ამ პირველი ექსპერიმენტის შემდეგ გადავწყვიტე, რომ მომეხსნა `RFE` და `CorrelationFilter` და მათ გარეშე გამეშვა DecisionTree-ის training.
+
+
+`GridSearch`-მა შეარჩია `classifier__max_depth: 10`. არამხოლოდ გაცილებით უფრო სწრაფად გაწვრთნა მოდელი, არამედ წინა მოდელის შედეგიც კი გაუმჯობესდა ამ მიდგომით:
+
+```
+mean_test_score: 0.8365177603386846
+mean_train_score: 0.8472737775044035
+```
+
+
+#### DecisionTree_ImpFeats_NoPreprocessing
+
+https://dagshub.com/vvaza22/ml-assignment-2.mlflow/#/experiments/0/runs/524405385115479cb13a1f25dfb60243
+
+წინა მოდელიდან ამოვიღე `.feature_importances_` პარამეტრი, დავსორტე feature-ები importance-ის კლებადობის მიხედვით, ავირჩიე პირველი 25 და ხელახლა გავწვრთენი მოდელი მხოლოდ ამ feature-ებით. მივიღე ძალიან მსგავსი ქულები:
+
+```
+mean_test_score: 0.8340279896868816
+mean_train_score: 0.8494336092248465
+```
+
+აქედან გამომდინარე დავასკვენი, რომ `max_features` ჰიპერპარამეტრის ხელოვნურად გაზრდა ვეღარ გააუმჯობესებდა ჩემს მოდელს. ასევე დავადგინე ისიც, რომ `max_depth`-ის ძალიან გაზრდისას მოდელის ვარიაცია იზრდებოდა, train score უმჯობესდებოდა, თუმცა test score უარესდებოდა შესაბამისად ყოველთვის გადაირჩეოდა `GridSearch`-ში, როგორც არასასურველი ჰიპერპარამეტრი.
+
+
+#### DecisionTree_ImbLearn_ImpFeats
+
+https://dagshub.com/vvaza22/ml-assignment-2.mlflow/#/experiments/0/runs/2781e3c59a174f93ac8c0225b09e8141
+
+შემდგომ შევეცადე, რომ გამეუმჯობესებინა მოდელის პერფორმანსი imbalanced learn-ზე გადასვლითა და `SMOTE` oversampler-ის გამოყენებით.
+
+
+შედეგი საგრძნობლად არ გაუმჯობესებულა test set-ზე.
+
+```
+mean_test_score: 0.840376626155647
+mean_train_score: 0.872917241423932
+validation_score: 0.8495009514852537
+```
+
+აქ ყურადღება მივაქციოთ, რომ `classifier__max_depth: 12` აირჩია `GridSearch`-მა იმის გამო, რომ სულ მცირედ აუმჯობესებდა test_score-ს, თუმცა უკვე ამ მნიშვნელობითაც კი შესამჩნევია აცდენა train_score-დან, რაც უკვე overfitting-ის ნიშანია.
+
+#### DecisionTree_ImbLearn_With_Preprocessing
+
+https://dagshub.com/vvaza22/ml-assignment-2.mlflow/#/experiments/0/runs/255ab7353a6a4a1b9852b94331314d96
+
+საბოლოოდ გადავწყვიტე, რომ დამებრუნებინა `RFE` და `CorrelationFilter` კლასები pipeline-ში და გამეშვა imbalanced learn, `SMOTE`-ით.
+
+test score ცოტათი გაუარესდა, თუმცა აცდენა train და test score-ს შორის შემცირდა:
+```
+auc_train_score: 0.8395134427310299
+auc_test_score: 0.8317566819010804
+```
+
+
+ამ მონაცემების გაანალიზებით, მივედი დასკვნამდე, რომ საბოლოოდ საუკეთესო შედეგი `DecisionTree_ImbLearn_ImpFeats` მოდელმა დადო test score-ზე
+```
+mean_test_score: 0.840376626155647
+```
+
+აღსანიშნავია, რომ ეს შედეგი მიღებულია KFold Cross Validation-ის შედეგად და ასევე დამატებით გატესტილია ცალკე გადადებულ validation set-ზე, რომელზეც ასევე დაახლოებით `0.84` ქულა აიღო. შედეგად მჯერა, რომ Kaggle-ის submission-შიც დაახლოებით მსგავს შედეგს დადებს.
 
 ## Random Forest
 
