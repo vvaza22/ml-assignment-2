@@ -286,6 +286,91 @@ param_grid = {
 ## GradientBoost
 
 
+#### GradientBoost_Prob_Model_1
+https://dagshub.com/vvaza22/ml-assignment-2.mlflow/#/experiments/3/runs/caa9c38abca64440af89be3484928644
+
+```
+classifier__learning_rate: 0.1
+classifier__max_depth: 3
+classifier__n_estimators: 30
+```
+
+```
+mean_test_score: 0.8621642808214002
+mean_train_score: 0.8641513980933139
+```
+
+
+
+
+
+#### GradientBoost_Prob_Model_2
+https://dagshub.com/vvaza22/ml-assignment-2.mlflow/#/experiments/3/runs/74ee43077cf041c695a468b33fb4438a
+
+
+```
+classifier__learning_rate: 0.5
+classifier__max_depth: 3
+classifier__max_features: 20
+classifier__n_estimators: 30
+```
+
+```
+mean_test_score: 0.8670516628046139
+mean_train_score: 0.8714593770651501
+```
+
+#### GradientBoost_ImbLearn_Model_Underfit
+https://dagshub.com/vvaza22/ml-assignment-2.mlflow/#/experiments/3/runs/a5d887ffee0640e5996bb3f8c2861abd
+
+
+```
+classifier__learning_rate: 0.5
+classifier__max_depth: 3
+classifier__max_features: 10
+classifier__n_estimators: 15
+```
+
+```
+mean_train_score: 0.8403792454621307
+mean_test_score: 0.8382784291488473
+```
+
+
+#### GradientBoost_ImbLearn_Model_Overfit
+
+https://dagshub.com/vvaza22/ml-assignment-2.mlflow/#/experiments/3/runs/23f4b13c485d40209531275a2dbef356
+
+
+```
+classifier__learning_rate: 0.5
+classifier__max_depth: 15
+classifier__max_features: 30
+classifier__n_estimators: 15
+```
+
+```
+mean_train_score: 0.9925195272634829
+mean_test_score: 0.9152955711907144
+```
+
+
+#### GradientBoost_ImbLearn_Model_Final
+https://dagshub.com/vvaza22/ml-assignment-2.mlflow/#/experiments/3/runs/f239f83891f142cdbf1ba657ab86aca0
+
+
+```
+classifier__learning_rate: 0.5
+classifier__max_depth: 6
+classifier__max_features: 30
+classifier__n_estimators: 50
+```
+
+```
+mean_train_score: 0.9136265609129025
+mean_test_score: 0.8972540084569255
+```
+
 ## XGBoost
 
 
