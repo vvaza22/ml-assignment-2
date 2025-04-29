@@ -165,8 +165,123 @@ mean_test_score: 0.840376626155647
 
 ## Random Forest
 
+
+#### RandomForest_Prob_Model
+
+https://dagshub.com/vvaza22/ml-assignment-2.mlflow/#/experiments/1/runs/8745feef1cf840f798d57d86c39e8f70
+
+თავდაპირველად მოდელი გავწვრთენი შედარებით ბევრ estimator-ზე თუმცა ხელოვნურად შევზუღდე estimator-ების სიღრმე მაქსიმუმ 5-მდე. `GridSearch`-მა შეარჩია შემდეგი ჰიპერპარამეტრები:
+
+```
+classifier__max_depth: 5
+classifier__n_estimators: 100
+```
+
+და მოდელმა მომცა შესაბამისი ქულები:
+
+```
+mean_train_score: 0.8554407806041788
+mean_test_score: 0.8533557563035449
+```
+
+იქიდან გამომდინარე, რომ ეს ორი შედეგი საკმაოდ ახლოა ერთმანეთთან, ეჭვი მიჩნდება, რომ ჩემს მოდელს აქვს bias და შესაბამისად არის underfitted.
+
+
+#### RandomForest_Prob_Model_LongRun
+
+https://dagshub.com/vvaza22/ml-assignment-2.mlflow/#/experiments/1/runs/745a4d045d3a487993b010768c81fbe2
+
+
+ეჭვების შესამოწმებლად `GridSearch` გავუშვი შემდეგი პარამეტრებით:
+
+```
+param_grid = {
+    "classifier__max_depth": [7, 10],
+    "classifier__n_estimators": [100, 200, 300],
+    "classifier__max_features": [10, 20, 30]
+}
+```
+
+`GridSearch` გაშვებული იყო თითქმის 3 საათი. ჰიპერპარამეტრები შეირჩა უკიდურესი: 
+```
+classifier__max_depth: 10
+classifier__max_features: 30
+classifier__n_estimators: 300
+```
+
+და შედეგები test და train set-ზე საგრძნობლად გაუმჯობესდა:
+```
+mean_test_score: 0.9010211818793185
+mean_train_score: 0.920216173466
+```
+
+აქედან გამომდინარე, ჩემი ეჭვები გამართლდა, რომ თავდაპირველი მოდელი იყო underfitted.
+
 ## AdaBoost
 
+
+#### AdaBoost_Prob_Model_1
+https://dagshub.com/vvaza22/ml-assignment-2.mlflow/#/experiments/4/runs/ab773553dccd4c698f2ac1cb9f10995e
+
+
+თავდაპირველად AdaBoost დავათრენინგე საკმაოდ default პარამეტრებით. გამოვიყენე მხოლოდ 1 სიღრმის stump-ები AdaBoost-ის ქვეხეებად.
+
+```
+classifier__n_estimators: 100
+classifier__learning_rate: 1
+classifier__stump_max_depth: 1
+```
+
+ამ პარამეტრებმა შეძლო საკმაოდ სოლიდური შედეგის დადება:
+```
+mean_test_score: 0.8825256415014202
+mean_train_score: 0.8870550889208072
+```
+
+
+#### AdaBoost_Prob_Model_Underfit
+https://dagshub.com/vvaza22/ml-assignment-2.mlflow/#/experiments/4/runs/86a38b2baf1c4a2386d74bc1b2eba773
+
+შევამჩნიე, რომ წინა მოდელის გაწვრთნას საკმაოდ დიდი ხანი მოუნდა და დამაინტერესა, თუ რამდენად დაეცემოდა მოდელის პერფორმანსი თუ ასწრაფების მიზნით გავწვრთნიდი მხოლოდ 5 estimator-ზე.
+
+ქულა შემცირდა:
+```
+mean_test_score: 0.7408871103120306
+mean_train_score: 0.7412974897476383
+```
+
+თუმცა `mean_fit_time`-ის შემცირება უფრო დრამატული იყო `264.19`-დან `78.08-მდე`.
+
+
+#### AdaBoost_Prob_Model_Deeper_Stumps
+https://dagshub.com/vvaza22/ml-assignment-2.mlflow/#/experiments/4/runs/a68eda690943451893873b18b1d5c00d
+
+შემდეგ ექსპერიმენტში გადავწყვიტე გამეზარდა stump-ების სიღრმე 2-მდე და დავკვირვებოდი, გამოიწვევდა თუ არა ეს overfitted მოდელს. იმისათვის, რომ სწრაფად გამეწვრთნა მოდელი ავიღე მხოლოდ 10 estimator-ი.
+
+არათუ არ მივიღე overfitted მოდელი, არამედ უარესი ქულა მივიღე, ვიდრე სულ თავდაპირველი run:
+
+```
+mean_test_score: 0.8269639243350818
+mean_train_score: 0.8283142297864686
+```
+
+
+#### AdaBoost_Prob_Model_2
+
+https://dagshub.com/vvaza22/ml-assignment-2.mlflow/#/experiments/4/runs/1e10a425b3a94a01bfa29c90009827f1
+
+შემდეგ მოდელში შევეცადე დამერეგულირებინა `learning_rate` GridSearch-ის შემდეგი პარამეტრებით:
+
+```
+param_grid = {
+    "classifier__learning_rate": [1, 2],
+    "classifier__n_estimators": [70],
+    "classifier__stump_max_depth": [1],
+}
+```
+ამ run-დან გავიგე, რომ testscore ფაქტობრივად განახევრდა მაღალ `learning_rate`-ზე და შესაბამისად GridSearch-მა შეარჩია `learning_rate=1`
+
+ყველაზე დიდი პრობლემა ის იყო, რომ თითოეულ fit-ს მოუნდა დაახლოებით 12 წთ, ასეთ მარტივ მოდელზეც კი. ეს უკვე გაცილებით უარესს ხდის `AdaBoost`-ს `RandomForest`-ზე, `GradientBoost`-სა და `XGBoost`-ზე. ამიტომ გადავწყვიტე, რომ ამ run-ის შემდეგ აღარ გამეგრძელებინა `AdaBoost`-ის training.
 
 ## GradientBoost
 
