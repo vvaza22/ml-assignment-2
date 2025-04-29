@@ -289,24 +289,29 @@ param_grid = {
 #### GradientBoost_Prob_Model_1
 https://dagshub.com/vvaza22/ml-assignment-2.mlflow/#/experiments/3/runs/caa9c38abca64440af89be3484928644
 
+
+როგორც სხვა შემთხვევებში, `GradientBoost`-ის გაწვრთნას ვიწყებ შედარებით მარტივი მოდელით და კომპლექსურობას ვუზრდი შემდეგ run-ებზე. თავდაპირველი run-ის პარამეტრებიდან `GridSearch`-მა ამოარჩია:
+
 ```
 classifier__learning_rate: 0.1
 classifier__max_depth: 3
 classifier__n_estimators: 30
 ```
 
+მოდელმა მომცა შემდეგი შედეგები:
+
 ```
 mean_test_score: 0.8621642808214002
 mean_train_score: 0.8641513980933139
 ```
 
-
-
-
+ახლა საჭიროა გადამოწმდეს, რომ მოდელი არ არის underfitted და ეს შესაძლებელია კომპლექსურობის გაზრდით.
 
 #### GradientBoost_Prob_Model_2
 https://dagshub.com/vvaza22/ml-assignment-2.mlflow/#/experiments/3/runs/74ee43077cf041c695a468b33fb4438a
 
+
+მეორე run-ისთვის საშუალებას ვაძლევ `GridSearch`-ს, რომ უფრო კომპლექსური მოდელი გაწვრთნას, ასევე თავისუფლებას ვაძლევ `learning_rate`-ის შერჩევაზე და შედეგად აირჩევა შემდეგი პარამეტრები:
 
 ```
 classifier__learning_rate: 0.5
@@ -314,6 +319,8 @@ classifier__max_depth: 3
 classifier__max_features: 20
 classifier__n_estimators: 30
 ```
+
+გაწვრთნილი მოდელი გვაძლევს შემდეგ შედეგებს:
 
 ```
 mean_test_score: 0.8670516628046139
@@ -323,7 +330,7 @@ mean_train_score: 0.8714593770651501
 #### GradientBoost_ImbLearn_Model_Underfit
 https://dagshub.com/vvaza22/ml-assignment-2.mlflow/#/experiments/3/runs/a5d887ffee0640e5996bb3f8c2861abd
 
-
+მნიშვნელოვანი დაკვირვებაა, რომ თუ `max_features` და `n_estimators` მნიშვნელობებს, უფრო დაბალ რიცხვებზე დავაყენებთ, მოდელში გავაჩენთ ბაიასს.
 ```
 classifier__learning_rate: 0.5
 classifier__max_depth: 3
@@ -331,6 +338,7 @@ classifier__max_features: 10
 classifier__n_estimators: 15
 ```
 
+იგი ვეღარ შეძლებს დაიჭიროს მონაცემების კომპლექსურობა და შედეგად ორივე score დაეცემა:
 ```
 mean_train_score: 0.8403792454621307
 mean_test_score: 0.8382784291488473
@@ -342,12 +350,16 @@ mean_test_score: 0.8382784291488473
 https://dagshub.com/vvaza22/ml-assignment-2.mlflow/#/experiments/3/runs/23f4b13c485d40209531275a2dbef356
 
 
+იმასაც დავაკვირდი, რომ `max_depth` მნიშვნელობის გაზრდის შედეგად, მოდელი გაცილებით უფრო expressive ხდება.
+
 ```
 classifier__learning_rate: 0.5
 classifier__max_depth: 15
 classifier__max_features: 30
 classifier__n_estimators: 15
 ```
+
+იგი აიღებს თითქმის უნაკლო შედეგს train set-ზე, თუმცა test set-ზე ქულის ვარდნა ძალიან შესამჩნევია. ამ შემთხვევაში მოდელს ახასიათებს მაღალი ვარიაცია და არის overfitted.
 
 ```
 mean_train_score: 0.9925195272634829
@@ -359,12 +371,16 @@ mean_test_score: 0.9152955711907144
 https://dagshub.com/vvaza22/ml-assignment-2.mlflow/#/experiments/3/runs/f239f83891f142cdbf1ba657ab86aca0
 
 
+უამრავი პარამეტრის გადარჩევის შედეგად `GridSearch`-ის საშუალებით საბოლოოდ შევჯერდი მოდელის შემდეგ ჰიპერპარამეტრებზე:
+
 ```
 classifier__learning_rate: 0.5
 classifier__max_depth: 6
 classifier__max_features: 30
 classifier__n_estimators: 50
 ```
+
+ამ ჰიპერპარამეტრებით მოდელმა დადო საკმაო სოლიდური შედეგი:
 
 ```
 mean_train_score: 0.9136265609129025
