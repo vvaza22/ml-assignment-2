@@ -226,6 +226,43 @@ mean_train_score: 0.920216173466
 
 აქედან გამომდინარე, ჩემი ეჭვები გამართლდა, რომ თავდაპირველი მოდელი იყო underfitted.
 
+ლოგიკურია, რომ estimator-ების რაოდენობის გაზრდა ყოველთვის გაზრდის პერფორმანსს, თუმცა ასევე ზრიდს training-ის დროს. მაგალითად 300-ზე 1 მოდელის გაწვრთნას 10წთ უნდოდა და თუ გავითვალისწინებთ, რომ KFold-ით ვაკეთებდი გაწვრთნას ანუ ნახევარი საათი იწვრთნებოდა 1 კანდიდატი.
+
+`max_features`-ის ზრდაც ლოგიკურია, რომ გამოიწვევს პერფორმანსის ზრდას, თუმცა შეიძლება ეს gain იმდენად მცირე იყოს, რომ უბრალოდ არ გვიღირდეს ამ ჰიპერპარამეტრის შეცვლა.
+
+შეგვიძლია დავაკვირდეთ `GridSearch`-ის verbose output-ს. feature-ების რაოდენობის გაზრდით, როდესაც ყველა სხვა პარამეტრი დაფიქსირებულია ცოტათი იზრდება test_score, თუმცა საგრძნობლად იზრდება train time და აქედან გამომდინარე მივდივარ დასკვნამდე, რომ ამ პარამეტრის გაზრდა აღარ ღირს.
+
+```
+classifier__max_depth=7, classifier__max_features=10, classifier__n_estimators=100;, score=(train=0.871, test=0.863) total time= 1.4min
+
+classifier__max_depth=7, classifier__max_features=20, classifier__n_estimators=100;, score=(train=0.880, test=0.880) total time= 2.1min
+
+classifier__max_depth=7, classifier__max_features=30, classifier__n_estimators=100;, score=(train=0.883, test=0.883) total time= 2.7min
+```
+ასევე რაც უფრო მეტ feature-ს მონიშნავ, overfitting-ის რისკიც უფრო იზრდება.
+
+#### RandomForest_Overfit
+
+https://dagshub.com/vvaza22/ml-assignment-2.mlflow/#/experiments/1/runs/a437f08d9b364119a5f842d2f1820004
+
+შევამოწმე ასევე:
+
+```
+classifier__max_depth: 15
+classifier__max_features: 30
+classifier__n_estimators: 300
+```
+
+მომცა შედეგი:
+```
+auc_train_score: 0.9696451388237529
+auc_test_score: 0.9303012880811381
+```
+
+მართალია, გაიზარდა test score, თუმცა ეს მოხვდა ძალიან დიდი training დროის ხარჯზე. ასევე დავაკვირდეთ იმასაც, რომ სხვაობა train და test score-ს შორის უფრო და უფრო იზრდება, რაც არის overfit-ის ნიშანი.
+
+ამ ორი პირობიდან გამომდინარე, მე ვამჯობინებდი წინა RandomForest მოდელს.
+
 ## AdaBoost
 
 
