@@ -36,11 +36,18 @@
 
 # Feature Selection
 
-თავდაპირველად correlated feature-ების გასაცხრილად გადავწყვიყე გამომეყენებინა კორელაციის ფილტრი. ფილტრის `threshold`-ად ავიღე `80%`. შევქმენი კლასი `CorrelationFilter`, რომელიც შეგიძლიათ **model_experiment_DecisionTree.ipynb** ფაილში ნახოთ. ამ კლასის ჩამატება შესაძლებელია `pipeline`-ში საჭიროებისამებრ.
+მოდელები, რომლებიც გავტესტე აქვთ საკმაოდ კარგი შესაძლებლობა თავად შეარჩიონ უმნიშვნელოვანესი feature-ები training-ის პროცესში.
 
-თავდაპირველად ასევე გამოვიყენე `RFE` feature selection-ისთვის `n_features_to_select`-ის მნიშვნელობას ვარჩევდი `GridSearch`-ის საშუალებით.
+თავდაპირველად, როდესაც დავიწყე `DecisionTree`-ს გაწვრთნა გადავწყვიტე, რომ შევშველებოდი `CorrelationFilter`-ითა და `RFE`-ით. `CorrelationFilter`-ის `threshold`-ად ავიღე `80%`, ხოლო  `RFE` feature selection-ისთვის `n_features_to_select`-ის მნიშვნელობას ვარჩევდი `GridSearch`-ის საშუალებით. თუმცა როგორც გაირკვევა ქვემოთ მოყვანილი დეტალური training-ის აღწერით. `RFE` და `CorrelationFilter` ძალიან ანელებდა training-ის პროცესს და არც ძალიან კარგი შედეგი არ დადო `native` feature selection-თან შედარებით. ასე, რომ მომავალ მოდელებში უბრალოდ აღარ გამომიყენებია.
+
+ასევე ზოგჯერ ვიყენებდი feature importances და shap მნიშვნელობებს იმისათვის, რომ გამეგო რომელი feature-ები იყო ყველაზე მნიშვნელოვანი მოდელისთვის. რამდენჯერმე მხოლოდ პირველი რამდენიმე important feature მოვნიშნე და ამ feature-ებით ხელახლა გავწვრთენი მოდელი. ეს იყო ერთ-ერთი მიდგომა, რომელიც მეხმარებოდა ორმხრივად: 
+
+1. გაცილებით უფრო სწრაფი იყო training ნაკლებ feature-ზე და 
+1. თუ დაახლოებით იგივე ქულას მომცემდა მოდელი, მაშინ ვხდებოდი, რომ `max_features` ჰიპერპარამეტრის გაზრდას აზრი არ აქვს.
 
 # Training
+
+Data Inspection-ის დროს გავარკვიე, რომ მონაცემები იყო არადაბალანსებული target-ის მიხედვით. ამიტომ კროსვალიდაციისთვის, გადავწყვიტე, რომ გამომეყენებინა `StratifiedKFold`, რომელიც განაწილებას ინარჩუნებს split-ებში. Training-ის სხვადასხვა ეტაპზე ვიყენებდი, როგორც ჩვეულებრივე `Pipeline`-ს ასევე `ImbalancedPipeline`-ს `SMOTE`-თან ერთად, რათა უფრო მეტ fraudulent ტრანზაქციაზე გამეწვრთნა ჩემი მოდელი. გამოყენებული მიდგომები აღწერილია თითოეული მოდელისთვის `MLflow`-ს `Parameters`-ში.
 
 ## Decision Tree
 
@@ -389,6 +396,114 @@ mean_test_score: 0.8972540084569255
 
 ## XGBoost
 
+`XGBoost`-ის პირველი ექსპერიმენტებიდანვე ჩანს, რომ საკმაოდ ექსპრესიული მოდელია, რომელსაც ადვილად შეუძლია overfit.
+
+თავდაპირველ run-ებზე `XGBoost_Prob_Model`-დან დაწყებული და `XGBoost_Prob_ImbLearn_Model_5`-ით დამთავრებული ის შეცდომა დავუშვი, რომ `GridSearch`-ს საშუალებას ვაძლევდი ძალიან ბევრი ჰიპერპარამეტრი შეეცვალა თანადროულად. შესაბამისად მიღებული შედეგებიდან კარგი დასკვნები ვერ გამომქონდა. ამ შეცდომის გამოსასწორებლად გადავწყვიტე ხელახლა გამეწვრთნა `XGBoost` ისე, რომ ყველა პარამეტრი დამეფიქსირებინა და მხოლოდ 1 ან 2 პარამეტრის ცვლილების საშუალება მიმეცა `GridSearch`-ისთვის.
+
+#### XGBoost_Retrain_Estimators
+https://dagshub.com/vvaza22/ml-assignment-2.mlflow/#/experiments/2/runs/93735797cd0b4dd5a7fb165a4b05b6f6
+
+წინა run-ების შედარებით უშედეგობიდან გამომდინარე გადავწყვიტე, რომ თავედან დამეწყო training. ახლა ავირჩიე სხვანაირი მიდგომა. თავიდან Regularization და Lambda კონსტანტები გავუტოლე 0-ს, რადგან მათ ხელი არ შეეშალა გადაწყვეტილების მიღებაში და `GridSearch` გავუშვი შემდეგ პარამეტრებზე:
+
+```
+"classifier__max_depth": [6],
+"classifier__n_estimators": [10, 50, 100],
+"classifier__learning_rate": [0.3]
+```
+
+ამ run-დან გამოვიტანე დასკვნა, რომ ყველაზე მაღალი test score ჰქონდა უფრო მაღალი `n_estimators` მქონე მოდელს. მნიშვნელობა `100`-ზე მოდელმა დადო საუკეთესო შედეგი:
+
+```
+validation_score: 0.9302013563127417
+mean_test_score: 0.927280733448686
+mean_train_score: 0.9478872045733354
+```
+
+თუმცა ისიც გასათვალისწინებელია, რომ trade-off იყო პერფორმანსაა და გაწვრთნისთვის საჭირო დროის შორის. რადგან მაღალი მნიშვნელობა უფრო დიდხანს გაწვრთნას ითხოვდა, გადავწყვიტე 100-ზე შევჩერებულიყავი.
+
+
+#### XGBoost_Retrain_MaxDepth
+
+https://dagshub.com/vvaza22/ml-assignment-2.mlflow/#/experiments/2/runs/27906199ed60497288c7585a7c4f4323
+
+შემდეგ გადავწყვიტე, რომ დავკვირვებოდი რა გავლენა აქვს `max_depth` ჰიპერპარამეტრს, როდესაც დაფიქსირებული მაქვს `n_estimators`. `GridSearch` გავუშვი შემდეგი პარამეტრებით:
+
+```
+"classifier__max_depth": [3, 10]
+```
+
+output-დან აღმოჩნდა, რომ როდესაც `max_depth` არის `3`, მაშინ მოდელი underfitted ხდება და კარგავს ექსპრესიულობას, რომელიც საჭიროა მონაცემების კლასიფიკაციისთვის. დაკვირვბის შედეგად აღმოჩნდა, რომ რაც უფრო იზრდებოდა `max_depth` მნიშვნელობა, მით უფრო იზრდებოდა ორივე `test_score`-იც და `train_score`-იც, თუმცა აღსანიშნავია, რომ ასევე იზრდებოდა სხვაობა ამ ორ ქულას შორის, რაც უკვე overfitting-ის ნიშანია.
+
+
+`GridSeach`-მა შეარჩია `classifier__max_depth: 10` და მომცა შედეგები:
+
+```
+mean_train_score: 0.9953115256817364
+mean_test_score: 0.9547437513207216
+validation_score: 0.9636374289611603
+```
+
+train_score თითქმის უნაკლოა, თუმცა test_score ჩამორჩება და შესაბამისად ეს მოდელი უკვე არის overfitted.
+
+
+#### XGBoost_Retrain_Lambda
+
+https://dagshub.com/vvaza22/ml-assignment-2.mlflow/#/experiments/2/runs/5d494538f8d9445da2869837c7d3da50
+
+
+შემდეგი ექსპერიმენტისთვის გადავწყვიტე, რომ შემემცირებინა overfit `lambda` ჰიპერპარამეტრის დარეგულირებით, რომელიც ხელს უშლის split-ს ხეში, თუკი gain საკმარისად დიდი არ არის. `GridSearch` გავუშვი შემდეგ პარამეტრებზე:
+
+```
+"classifier__lambda": [1, 3, 5]
+```
+
+lambda-ს მაღალი მნიშვნელობა ამცირებდა, როგორც train_score-ს ასევე test_score-ს, ასე რომ `GridSearch`-მა აირჩია `lambda=3` და მიიღო საბოლოო შედეგი:
+
+```
+mean_test_score: 0.9542078723719799
+mean_train_score: 0.9915227902443476
+validation_score: 0.9630909076288943
+```
+
+ჩემი აზრით, მაინც არ არის იდეალური შედეგი, ამიტომაც გადავწყვიტე `max_depth` 6-ზე დამებრუნებინა და `lambda=3` დამეტოვა.
+
+#### XGBoost_Retrain_Lambda_Final
+
+https://dagshub.com/vvaza22/ml-assignment-2.mlflow/#/experiments/2/runs/ee12bc86013845078be62a0ef3317580
+
+ეს არის მიღებული შედეგი `max_depth: 6, lambda: 3` ჰიპერპარამეტრებით:
+
+```
+mean_test_score: 0.9261029631238396
+mean_train_score: 0.9457706786630521
+validation_score: 0.9287962155289229
+```
+
+test_score და train_score დაახლოვდა და overfitting-იც ნაკლებად შესამჩნევია.
+
+
+#### XGBoost_Retrain_Regularization
+https://dagshub.com/vvaza22/ml-assignment-2.mlflow/#/experiments/2/runs/00ad88b45697450ebb88d8d1867f1734
+
+იმისათვის, რომ overfit მომეშორებინა საბოლოოდ მივმართე `Regularization`-ს:
+
+```
+"classifier__gamma": [0.1, 5, 10],
+"classifier__alpha": [0.1, 5, 10]
+```
+
+`GridSearch`-მა საბოლოოდ პარამეტრებად შეარჩია:
+
+```
+classifier__alpha: 5
+classifier__gamma: 0.1
+```
+
+საბოლოო შედეგია:
+```
+mean_train_score: 0.9441610796704234
+mean_test_score: 0.9258656855276309
+```
 
 # MLflow Tracking
 
