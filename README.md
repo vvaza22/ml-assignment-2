@@ -19,6 +19,8 @@
 
 - **model_experiment_XGBoost.ipynb** - XGBoost მოდელის notebook.
 
+- **model_inference.ipynb** - საბოლოო მოდელის გაგზავნა Kaggle-ზე.
+
 
 # Feature Engineering
 
@@ -503,6 +505,23 @@ classifier__gamma: 0.1
 ```
 mean_train_score: 0.9441610796704234
 mean_test_score: 0.9258656855276309
+```
+
+# Submission
+
+აღმოჩნდა, რომ test set და train set-ის feature-ების სახელები ცოტათი განსხვავდება. მაგალითად id ველები train set-ში წერია, როგორც `id_10`, ხოლო test set-ში კი - `id-10`. შესაბამისად Inference notebook-ში მომიწია სახელები გადამეკეთებინა ისე, რომ დამთხვეოდა train set-ს.
+
+საბოლოო Submission-ისთვის შევარჩიე `XGBoost`-ის მოდელი `XGBoost_Retrain_Regularization`.
+
+https://dagshub.com/vvaza22/ml-assignment-2.mlflow/#/experiments/2/runs/00ad88b45697450ebb88d8d1867f1734
+
+ეს მოდელი იმიტომ შევარჩიე, რომ აქვს მაღალი score test_set-ზე, რომელიც ძალიან არ განსხვავდება train_score-ისგან. ვიზრუნე ბევრი, რომ overfitted არ ყოფილიყო.
+
+მივიღე სოლიდური შედეგი, რომელიც დაახლოებით მოსალოდნელი იყო:
+
+```
+Public Score: 0.914897
+Private score: 0.896825
 ```
 
 # MLflow Tracking
